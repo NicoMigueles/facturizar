@@ -1,18 +1,24 @@
 #!/usr/bin/env python
 
-import os
 import sys
-import factura
 import json
+import utils
+import factura
+
+from drive import updateFacturasFromDrive
 
 
-def parseFolder(path):
-    return [factura.parseFactura(pdf) for pdf in os.listdir(path) if '.pdf' in pdf]
+def main():
+    updateFacturasFromDrive()
+    facturas = factura.parseFolder('facturas')
 
-
-if len(sys.argv) == 2:
-    facturas = parseFolder(str(sys.argv[1]))
-    with open('out.json', 'w') as outfile:
+    print((f'\nTransformando {len(facturas)} facturas.'))
+    with open('out/all.json', 'w') as outfile:
         json.dump(facturas, outfile)
-else:
-    print('Usage: facturizar path')
+    print('Generated all.json')
+    utils.saveToCsv('out/facturas.csv', facturas)
+    print('Generated facturas.csv')
+
+
+if __name__ == '__main__':
+    main()

@@ -1,3 +1,5 @@
+private/
 *.pdf
-out.json
+*.json
+*.csv
 __pycache__

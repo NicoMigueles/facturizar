@@ -1,6 +1,6 @@
 # Facturizar
 
-Usage `./main.py path_to_folder`
+Herramienta para generar información a partir facturas de ventas de una empresa.
 
 Input:
 

@@ -10,6 +10,7 @@ Output:
 
 ```JSON
   {
+    "fecha": "dd/mm/aaaa",
     "factura": "A",
     "razon-social": "******",
     "condicion": "IVA Responsable Inscripto",

@@ -112,6 +112,7 @@ def toFactura(raw_output):
     raw_list = renameDuplicates(raw_output.split('\n\n'))
     tipo_factura = raw_list[1].split('\n')[1]
     razon_social = getByFieldName(raw_list, 'Razón Social:')
+    fecha = getByFieldName(raw_list, 'Fecha de Emisión:')
     cond_frente_al_iva = getByFieldName(raw_list, 'Condición frente al IVA:')
     punto_venta = getByFieldName(raw_list, 'Punto de Venta:')
     num_comp = getByFieldName(raw_list, 'Comp. Nro:')
@@ -148,6 +149,7 @@ def toFactura(raw_output):
     importe_otros_tributos = totales[7]
 
     return {
+        'fecha': fecha,
         'factura': tipo_factura,
         'razon-social': razon_social,
         'condicion': cond_frente_al_iva,

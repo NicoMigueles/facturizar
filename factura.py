@@ -21,95 +21,102 @@ def renameDuplicates(l):
     return response
 
 
-def getItems(l):
-    first_index = l.index('Alicuota\nIVA')
-    index = first_index
-    items = []
-    protected = False
-    last = False
-    while(l[index+1] != 'Otros Tributos'):
-        item = []
-        if protected:
-            iterations = range(6)
-            try:
-                if len(items) and float(l[index + 1].replace(',', '.')) == items[0]['subtotal-iva']:
-                    index += len(items)
-                    last = True
-            except:
-                pass
-        else:
-            iterations = range(7)
+def getItems(l, num_factura=""):
+    try:
+        first_index = l.index('Alicuota\nIVA')
+        index = first_index
+        items = []
+        protected = False
+        last = False
+        while(l[index+1] != 'Otros Tributos' and not "ORDEN DE COMPRA" in l[index+1] and not "POD-TSF" in l[index+1]):
+            item = []
+            if protected:
+                iterations = range(6)
+                try:
+                    if len(items) and float(l[index + 1].replace(',', '.')) == items[0]['subtotal-iva']:
+                        index += len(items)
+                        last = True
+                except:
+                    pass
+            else:
+                iterations = range(7)
 
-        for i in iterations:
-            index += 1
-            if not last:
-                if i == 1:
-                    if ' ' in l[index]:
-                        item.append(l[index].split(' ')[0])
-                        item.append(l[index].split(' ')[1])
+            for i in iterations:
+                index += 1
+                if not last:
+                    if i == 1:
+                        if ' ' in l[index]:
+                            item.append(l[index].split(' ')[0])
+                            item.append(l[index].split(' ')[1])
+                        else:
+                            pass
+                            # print('No tiene espacio en el nombre wtf', l[index])
+
+                    elif i == 6:
+                        try:
+                            utils.toFloat(l, index)
+                            item.append(l[index])
+                        except:
+                            protected = True
+                            index -= 1
+                            continue
                     else:
-                        print('No tiene espacio en el nombre wtf', l[index])
-
-                elif i == 6:
-                    try:
-                        utils.toFloat(l, index)
                         item.append(l[index])
-                    except:
-                        protected = True
-                        index -= 1
-                        continue
                 else:
-                    item.append(l[index])
-            else:
-                if i == 0:
-                    if ' ' in l[index]:
-                        item.append(l[index].split(' ')[0])
-                        item.append(l[index].split(' ')[1])
+                    if i == 0:
+                        if ' ' in l[index]:
+                            item.append(l[index].split(' ')[0])
+                            item.append(l[index].split(' ')[1])
+                        else:
+                            pass
+                            # print('No tiene espacio en el nombre wtf', l[index])
+
+                    elif i == 5:
+                        index += 1
+                        item.insert(0, l[index])
                     else:
-                        print('No tiene espacio en el nombre wtf', l[index])
+                        item.append(l[index])
 
-                elif i == 5:
-                    index += 1
-                    item.insert(0, l[index])
+            nombre = item[0]
+            if '\n' in item[0]:
+                nombres = []
+                for potencial in item[0].split('\n'):
+                    if 'O/C' in potencial:
+                        continue
+                    nombres.append(potencial)
+
+                if len(nombres) == 1:
+                    nombre = nombres[0]
                 else:
-                    item.append(l[index])
+                    nombre = ' '.join(nombres)
 
-        nombre = item[0]
-        if '\n' in item[0]:
-            nombres = []
-            for potencial in item[0].split('\n'):
-                if 'O/C' in potencial:
-                    continue
-                nombres.append(potencial)
-
-            if len(nombres) == 1:
-                nombre = nombres[0]
+            if len(item) == 8:
+                subtotal_iva = item[7]
             else:
-                nombre = ' '.join(nombres)
+                utils.toFloat(item, 5)
+                utils.toFloat(item, 6)
 
-        if len(item) == 8:
-            subtotal_iva = item[7]
-        else:
-            utils.toFloat(item, 5)
-            utils.toFloat(item, 6)
+                subtotal_iva = item[5] * (item[6] + 1.00)
 
-            subtotal_iva = item[5] * (item[6] + 1.00)
-
-        items.append({
-            'producto': nombre,
-            'cantidad': item[1],
-            'unidad': item[2],
-            'precio-unit': item[3],
-            'bonif-porc': item[4],
-            'subtotal': item[5],
-            'iva': item[6],
-            'subtotal-iva': subtotal_iva,
-        })
-    return items
+            items.append({
+                'producto': nombre,
+                'cantidad': item[1],
+                'unidad': item[2],
+                'precio-unit': item[3],
+                'bonif-porc': item[4],
+                'subtotal': item[5],
+                'iva': item[6],
+                'subtotal-iva': subtotal_iva,
+            })
+        return items
+    except:
+        print(f'No se pudo obtener los items de la factura {num_factura}.')
+        return []
 
 
 def toFactura(raw_output):
     raw_list = renameDuplicates(raw_output.split('\n\n'))
+
     tipo_factura = raw_list[1].split('\n')[1]
     razon_social = getByFieldName(raw_list, 'Razón Social:')
     fecha = getByFieldName(raw_list, 'Fecha de Emisión:')
@@ -133,7 +140,8 @@ def toFactura(raw_output):
     destinatario_cuit = getByFieldName(raw_list, 'CUIT:')
     destinatario_condicion_de_venta = getByFieldName(
         raw_list, 'Condición de venta:')
-    items = getItems(raw_list)
+
+    items = getItems(raw_list, num_comp)
 
     importe_total = getByFieldName(raw_list, 'Importe Total: $')
     totales = getByFieldName(raw_list,

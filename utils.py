@@ -20,19 +20,29 @@ def cleanCsv(input, output):
 def saveToCsv(filename, dict_data):
     try:
         csv_columns = dict_data[0].keys()
-        with open(filename, 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+        with open(filename, 'w', newline='') as csvfile:
+            writer = csv.DictWriter(
+                csvfile, fieldnames=csv_columns)
             writer.writeheader()
             for data in dict_data:
                 if 'destinatario' in data.keys():
                     data['destinatario'] = ';'.join(
                         [data['destinatario'][key] for key in data['destinatario']])
-                # No lo convierto para que el excel me lo tome como número. wtf pero si.
-                # toFloat(data, 'importe_neto_gravado')
-                # toFloat(data, 'iva_21')
-                # toFloat(data, 'iva_10_5')
-                # toFloat(data, 'importe_otros_tributos')
-                # toFloat(data, 'importe_total')
+
+                if data == '\n':
+                    continue
                 writer.writerow(data)
     except IOError:
         print("I/O error")
+
+
+def obtenerZona(dir):
+    if 'Misiones' in dir:
+        return "M"
+    if 'Capital Federal' in dir:
+        return "C"
+    if 'Buenos Aires' in dir:
+        return "BA"
+
+    print(f'No se pudo reconocer automaticamente la zona de {dir}.')
+    return input("Ingrese zona manualmente: ").upper()

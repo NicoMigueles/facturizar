@@ -15,7 +15,7 @@ TARGET_FOLDER = "FACTURAS ONLINE"
 
 def descargarArchivo(item, service):
     if os.path.exists(f"facturas/{item['name']}"):
-        print(f"Skiping {item['name']} already exists.")
+        #print(f"Skiping {item['name']} already exists.")
         return
 
     request = service.files().get_media(fileId=item['id'])

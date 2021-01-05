@@ -110,7 +110,7 @@ def getItems(l, num_factura=""):
             })
         return items
     except:
-        print(f'No se pudo obtener los items de la factura {num_factura}.')
+        # print(f'No se pudo obtener los items de la factura {num_factura}.')
         return []
 
 

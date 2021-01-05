@@ -186,4 +186,4 @@ def parseFactura(path):
 
 
 def parseFolder(path):
-    return [parseFactura(f'{path}/{pdf}') for pdf in os.listdir(path) if '.pdf' in pdf]
+    return [parseFactura(f'{path}/{pdf}') for pdf in os.listdir(path) if '.pdf' in pdf and pdf.split('_')[1] == '001']

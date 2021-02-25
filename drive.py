@@ -10,7 +10,7 @@ from google.auth.transport.requests import Request
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
-TARGET_FOLDER = "2021 FACTURAS ON LINE"
+TARGET_FOLDER = "2021 FACTURAS ONLINE"
 
 
 def descargarArchivo(item, service):

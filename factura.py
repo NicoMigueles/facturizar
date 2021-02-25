@@ -116,8 +116,10 @@ def getItems(l, num_factura=""):
 
 def toFactura(raw_output):
     raw_list = renameDuplicates(raw_output.split('\n\n'))
+    print(raw_list)
 
-    tipo_factura = raw_list[1].split('\n')[1]
+    tipo_factura = raw_list[5].split('\n')[0]
+    print(tipo_factura)
     razon_social = getByFieldName(raw_list, 'Razón Social:')
     fecha = getByFieldName(raw_list, 'Fecha de Emisión:')
     cond_frente_al_iva = getByFieldName(raw_list, 'Condición frente al IVA:')
